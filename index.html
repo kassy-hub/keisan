@@ -1,17 +1,22 @@
 <div id="app">
-    <h2>Cats</h2>
-    <div v-for="(cat, key) in cats">
+    <h2>Formulas</h2>
+    <div v-for="(fm, key) in formulas">
         <p>
-            <span class="cat">@{{ cat }}</span>
-            <button @click="removeCat(key)">Remove</button>
+            <span class="fm">{{ fm.sahen1 }} {{ fm.operator.text }} {{ fm.sahen2 }} ＝ {{ fm.answer }}</span>
+            <button @click="removeFm(key)">Remove</button>
         </p>
     </div>
 
     <p>
-        <input v-model="newCat">
-        <button @click="addCat">Add Cat</button>
+        <input v-model="newFm.sahen1">
+        <select v-model="newFm.operator">
+            <option v-for="op in operators" v-bind:value="op">{{ op.text }}</option>
+        </select>
+        <input v-model="newFm.sahen2">
+        ＝
+        <input v-model="newFm.answer">
+        <button @click="addFm">Add</button>
     </p>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
@@ -19,60 +24,69 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/heyui"></script>
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heyui/themes/index.css">
-<script>
 
+<script>
 
     const app = new Vue({
         el: '#app',
         data: {
-            cats: [],
-            newCat: null
+            formulas: [],
+            operators: [
+                { value: "+", text: "＋" },
+                { value: "-", text: "−" },
+                { value: "*", text: "×" },
+                { value: "/", text: "÷" },
+            ],
+            newFm: { 
+                sahen1: null,
+                operator: { value: "+", text: "＋" },
+                sahen2: null,
+                answer: null,
+            }
         },
         mounted() {
-
             //json がぶっ壊れている可能性があるので、その場合は local storage を削除
-            if (localStorage.getItem('cats')) {
+            if (localStorage.getItem('formulas')) {
                 try {
-                    this.cats = JSON.parse(localStorage.getItem('cats'));
+                    this.formulas = JSON.parse(localStorage.getItem('formulas'));
                 } catch(e) {
-                    localStorage.removeItem('cats');
+                    localStorage.removeItem('formulas');
                 }
             }
         },
         methods: {
-            addCat() {
+            addFm() {
                 // 入力内容が空だったら何もしない
-                if (!this.newCat) {
+                if (!this.newFm.sahen1 || !this.newFm.sahen2 || !this.newFm.answer) {
                     return;
                 }
 
                 //猫を追加
-                this.cats.push(this.newCat);
+                this.formulas.push(this.newFm);
 
                 //テキストフィールドを空に
-                this.newCat = '';
+                this.newFm = { 
+                    sahen1: null,
+                    operator: "+",
+                    sahen2: null,
+                    answer: null
+                };
 
                 //猫を保存
-                this.saveCats();
+                this.saveFormulas();
             },
-            removeCat(key) {
-
+            removeFm(key) {
                 //指定されたキー猫を削除して保存しなおす
-                this.cats.splice(key, 1);
-                this.saveCats();
+                this.formulas.splice(key, 1);
+                this.saveFormulas();
             },
-            saveCats() {
-
+            saveFormulas() {
                 //this.cats の値を保存
-                const parsed = JSON.stringify(this.cats);
-                localStorage.setItem('cats', parsed);
+                const parsed = JSON.stringify(this.formulas);
+                localStorage.setItem('formulas', parsed);
             }
         }
     })
-
-
-
 
 </script>
