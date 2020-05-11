@@ -1,8 +1,19 @@
 <div id="app">
     <edit-formulas-list 
+        v-if="!isInPresentation"
         :formulas="formulas"
         @add-fm="addFm"
-    ></edit-formulas-list>
+    >
+    </edit-formulas-list>
+
+    <presentation
+        v-if="isInPresentation"
+        :formulas="formulas"
+    >
+    </presentation>
+
+    <button v-if="!isInPresentation" @click="startPresentation">Start Presentation</button>
+    <button v-if="isInPresentation" @click="startPresentation">Stop Presentation</button>
 </div>
 
 <script type="text/x-template" id="edit-formulas-list">
@@ -25,6 +36,17 @@
             <input v-model="newFm.answer">
             <button @click="addFm">Add</button>
         </p>
+    </div>
+</script>
+
+<script type="text/x-template" id="presentation">
+    <div id="presentation">
+        <div>
+            <p>
+                <span v-if="formula" class="fm">{{ formula.sahen1 }} {{ formula.operator.text }} {{ formula.sahen2 }} ＝ {{ answer ? formula.answer : "？" }}</span>
+                <button @click="next">Next</button>
+            </p>
+        </div>
     </div>
 </script>
 
@@ -72,7 +94,7 @@
                 //テキストフィールドを空に
                 this.newFm = { 
                     sahen1: null,
-                    operator: "+",
+                    operator: { value: "+", text: "＋" },
                     sahen2: null,
                     answer: null
                 };
@@ -84,13 +106,39 @@
         }
     }
 
+    var presentaion = {
+        template: '#presentation',
+        props: ['formulas'],
+        data: () => {
+            return {
+                index: null,
+                formula: null,
+                answer: false,
+            }
+        },
+        methods: {
+            next() {
+                if (this.index == null) {
+                    this.index = Math.floor(Math.random() * this.formulas.length);
+                    this.formula = this.formulas[this.index];
+                    this.answer = false;
+                } else {
+                    this.index = null;
+                    this.answer = true;
+                }
+            },
+        }
+    }
+
     const app = new Vue({
         el: '#app',
         data: {
-            formulas: []
+            formulas: [],
+            isInPresentation: false,
         },
         components: {
-            'edit-formulas-list': editFormulasList
+            'edit-formulas-list': editFormulasList,
+            'presentation': presentaion,
         },
         mounted() {
             //json がぶっ壊れている可能性があるので、その場合は local storage を削除
@@ -121,6 +169,9 @@
                 //this.cats の値を保存
                 const parsed = JSON.stringify(this.formulas);
                 localStorage.setItem('formulas', parsed);
+            },
+            startPresentation() {
+                this.isInPresentation = !this.isInPresentation;
             }
         }
     })
