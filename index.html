@@ -1,3 +1,24 @@
+<html>
+<head>
+
+<!-- Load required Bootstrap and BootstrapVue CSS -->
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+<!-- Load polyfills to support older browsers -->
+<!-- <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script> -->
+
+<!-- Load Vue followed by BootstrapVue -->
+<script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+
+<!-- Load the following for BootstrapVueIcons support -->
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+
+</head>
+
+<body>
+
 <div id="app">
     <edit-formulas-list 
         v-if="!isInPresentation"
@@ -50,13 +71,6 @@
         </div>
     </div>
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
-<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/heyui"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/heyui/themes/index.css">
 
 <script>
 
@@ -178,3 +192,6 @@
     })
 
 </script>
+
+</body>
+</html>
