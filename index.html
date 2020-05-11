@@ -1,23 +1,32 @@
 <div id="app">
-    <h2>Formulas</h2>
-    <div v-for="(fm, key) in formulas">
+    <edit-formulas-list 
+        :formulas="formulas"
+        @add-fm="addFm"
+    ></edit-formulas-list>
+</div>
+
+<script type="text/x-template" id="edit-formulas-list">
+    <div id="edit-formulas-list">
+        <h2>Formulas</h2>
+        <div v-for="(fm, key) in formulas">
+            <p>
+                <span class="fm">{{ fm.sahen1 }} {{ fm.operator.text }} {{ fm.sahen2 }} ＝ {{ fm.answer }}</span>
+                <button @click="removeFm(key)">Remove</button>
+            </p>
+        </div>
+
         <p>
-            <span class="fm">{{ fm.sahen1 }} {{ fm.operator.text }} {{ fm.sahen2 }} ＝ {{ fm.answer }}</span>
-            <button @click="removeFm(key)">Remove</button>
+            <input v-model="newFm.sahen1">
+            <select v-model="newFm.operator">
+                <option v-for="op in operators" v-bind:value="op">{{ op.text }}</option>
+            </select>
+            <input v-model="newFm.sahen2">
+            ＝
+            <input v-model="newFm.answer">
+            <button @click="addFm">Add</button>
         </p>
     </div>
-
-    <p>
-        <input v-model="newFm.sahen1">
-        <select v-model="newFm.operator">
-            <option v-for="op in operators" v-bind:value="op">{{ op.text }}</option>
-        </select>
-        <input v-model="newFm.sahen2">
-        ＝
-        <input v-model="newFm.answer">
-        <button @click="addFm">Add</button>
-    </p>
-</div>
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
 <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
@@ -28,22 +37,60 @@
 
 <script>
 
+    var editFormulasList = {
+        template: '#edit-formulas-list',
+        props: ['formulas'],
+        data: () => {
+            return {
+                operators: [
+                    { value: "+", text: "＋" },
+                    { value: "-", text: "−" },
+                    { value: "*", text: "×" },
+                    { value: "/", text: "÷" },
+                ],
+                newFm: {
+                    sahen1: null,
+                    operator: { value: "+", text: "＋" },
+                    sahen2: null,
+                    answer: null,
+                }
+            }
+        },
+        methods: {
+            addFm() {
+                console.log("addFm");
+                // 入力内容が空だったら何もしない
+                if (!this.newFm.sahen1 || !this.newFm.sahen2 || !this.newFm.answer) {
+                    console.log("addFm error");
+                    return;
+                }
+
+                //猫を追加
+                this.$emit('add-fm', this.newFm);
+                // this.formulas.push(this.newFm);
+
+                //テキストフィールドを空に
+                this.newFm = { 
+                    sahen1: null,
+                    operator: "+",
+                    sahen2: null,
+                    answer: null
+                };
+            },
+            removeFm(key) {
+                //指定されたキー猫を削除して保存しなおす
+                this.$emit('removeFm', key);
+            },
+        }
+    }
+
     const app = new Vue({
         el: '#app',
         data: {
-            formulas: [],
-            operators: [
-                { value: "+", text: "＋" },
-                { value: "-", text: "−" },
-                { value: "*", text: "×" },
-                { value: "/", text: "÷" },
-            ],
-            newFm: { 
-                sahen1: null,
-                operator: { value: "+", text: "＋" },
-                sahen2: null,
-                answer: null,
-            }
+            formulas: []
+        },
+        components: {
+            'edit-formulas-list': editFormulasList
         },
         mounted() {
             //json がぶっ壊れている可能性があるので、その場合は local storage を削除
@@ -56,22 +103,11 @@
             }
         },
         methods: {
-            addFm() {
-                // 入力内容が空だったら何もしない
-                if (!this.newFm.sahen1 || !this.newFm.sahen2 || !this.newFm.answer) {
-                    return;
-                }
+            addFm(newFm) {
+                console.log("app addFm");
 
                 //猫を追加
-                this.formulas.push(this.newFm);
-
-                //テキストフィールドを空に
-                this.newFm = { 
-                    sahen1: null,
-                    operator: "+",
-                    sahen2: null,
-                    answer: null
-                };
+                this.formulas.push(newFm);
 
                 //猫を保存
                 this.saveFormulas();
