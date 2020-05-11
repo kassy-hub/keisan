@@ -3,6 +3,7 @@
         v-if="!isInPresentation"
         :formulas="formulas"
         @add-fm="addFm"
+        @remove-fm="removeFm"
     >
     </edit-formulas-list>
 
@@ -101,7 +102,7 @@
             },
             removeFm(key) {
                 //指定されたキー猫を削除して保存しなおす
-                this.$emit('removeFm', key);
+                this.$emit('remove-fm', key);
             },
         }
     }
