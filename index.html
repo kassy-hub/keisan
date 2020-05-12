@@ -25,6 +25,7 @@
         :formulas="formulas"
         @add-fm="addFm"
         @remove-fm="removeFm"
+        @swap-fm="swapFm"
     >
     </edit-formulas-list>
 
@@ -41,12 +42,16 @@
 <script type="text/x-template" id="edit-formulas-list">
     <div id="edit-formulas-list">
         <h2>Formulas</h2>
-        <div v-for="(fm, key) in formulas">
-            <p>
-                <span class="fm">{{ fm.sahen1 }} {{ fm.operator.text }} {{ fm.sahen2 }} ＝ {{ fm.answer }}</span>
-                <button @click="removeFm(key)">Remove</button>
-            </p>
-        </div>
+        <b-table striped hover :items="formulas" :fields="fields">
+            <template v-slot:cell(formula)="row">
+                {{ row.item.sahen1 }} {{ row.item.operator.text }} {{ row.item.sahen2 }} ＝ {{ row.item.answer }}
+            </template>
+            <template v-slot:cell(actions)="row">
+                <b-button size="sm" @click="removeFm(row.item.key)">Remove</b-button>
+                <b-button size="sm" @click="swapFm(row.index, row.index - 1)">↑</b-button>
+                <b-button size="sm" @click="swapFm(row.index, row.index + 1)">↓</b-button>
+            </template>
+        </b-table>
 
         <p>
             <input v-model="newFm.sahen1">
@@ -74,6 +79,8 @@
 
 <script>
 
+    Vue.config.devtools = true;
+
     var editFormulasList = {
         template: '#edit-formulas-list',
         props: ['formulas'],
@@ -84,6 +91,10 @@
                     { value: "-", text: "−" },
                     { value: "*", text: "×" },
                     { value: "/", text: "÷" },
+                ],
+                fields: [
+                    "formula",
+                    "actions",
                 ],
                 newFm: {
                     sahen1: null,
@@ -117,6 +128,9 @@
             removeFm(key) {
                 //指定されたキー猫を削除して保存しなおす
                 this.$emit('remove-fm', key);
+            },
+            swapFm(idx1, idx2) {
+                this.$emit('swap-fm', { "idx1": idx1, "idx2": idx2})
             },
         }
     }
@@ -179,6 +193,16 @@
                 //指定されたキー猫を削除して保存しなおす
                 this.formulas.splice(key, 1);
                 this.saveFormulas();
+            },
+            swapFm(idxes) {
+                const min = Math.min(idxes.idx1, idxes.idx2);
+                const max = Math.max(idxes.idx1, idxes.idx2);
+
+                if (max - min != 1 || min < 0 || max > this.formulas.length - 1) { return; }
+
+                const minItem = this.formulas[min];
+                const maxItem = this.formulas[max];
+                this.formulas.splice(min, 2, maxItem, minItem);
             },
             saveFormulas() {
                 //this.cats の値を保存
