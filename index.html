@@ -35,8 +35,8 @@
     >
     </presentation>
 
-    <button v-if="!isInPresentation" @click="startPresentation">Start Presentation</button>
-    <button v-if="isInPresentation" @click="startPresentation">Stop Presentation</button>
+    <b-button v-if="!isInPresentation" @click="startPresentation" size="lg" variant="outline-primary">Start Presentation</b-button>
+    <b-button v-if="isInPresentation" @click="startPresentation"  size="lg" variant="outline-danger">Stop Presentation</b-button>
 </div>
 
 <script type="text/x-template" id="edit-formulas-list">
@@ -44,25 +44,23 @@
         <h2>Formulas</h2>
         <b-table striped hover :items="formulas" :fields="fields">
             <template v-slot:cell(formula)="row">
-                {{ row.item.sahen1 }} {{ row.item.operator.text }} {{ row.item.sahen2 }} ＝ {{ row.item.answer }}
+                {{ row.item.sahen1 }} {{ row.item.operator }} {{ row.item.sahen2 }} ＝ {{ row.item.answer }}
             </template>
             <template v-slot:cell(actions)="row">
-                <b-button size="sm" @click="removeFm(row.item.key)">Remove</b-button>
+                <b-button size="sm" @click="removeFm(row.item.key)" variant="danger">Remove</b-button>
                 <b-button size="sm" @click="swapFm(row.index, row.index - 1)">↑</b-button>
                 <b-button size="sm" @click="swapFm(row.index, row.index + 1)">↓</b-button>
             </template>
         </b-table>
 
-        <p>
-            <input v-model="newFm.sahen1">
-            <select v-model="newFm.operator">
-                <option v-for="op in operators" v-bind:value="op">{{ op.text }}</option>
-            </select>
-            <input v-model="newFm.sahen2">
+        <b-form inline @submit="addFm" @submit.stop.prevent>
+            <b-input v-model="newFm.sahen1" required />
+            <b-form-select v-model="newFm.operator" :options="operators" />
+            <b-input v-model="newFm.sahen2" required />
             ＝
-            <input v-model="newFm.answer">
-            <button @click="addFm">Add</button>
-        </p>
+            <b-input v-model="newFm.answer" required />
+            <b-button type="submit" variant="primary">Add</button>
+        </b-form>
     </div>
 </script>
 
@@ -70,7 +68,7 @@
     <div id="presentation">
         <div>
             <p>
-                <span v-if="formula" class="fm">{{ formula.sahen1 }} {{ formula.operator.text }} {{ formula.sahen2 }} ＝ {{ answer ? formula.answer : "？" }}</span>
+                <span v-if="formula" class="fm">{{ formula.sahen1 }} {{ formula.operator }} {{ formula.sahen2 }} ＝ {{ answer ? formula.answer : "？" }}</span>
                 <button @click="next">Next</button>
             </p>
         </div>
@@ -86,19 +84,14 @@
         props: ['formulas'],
         data: () => {
             return {
-                operators: [
-                    { value: "+", text: "＋" },
-                    { value: "-", text: "−" },
-                    { value: "*", text: "×" },
-                    { value: "/", text: "÷" },
-                ],
+                operators: [ "＋", "−", "×", "÷" ],
                 fields: [
                     "formula",
                     "actions",
                 ],
                 newFm: {
                     sahen1: null,
-                    operator: { value: "+", text: "＋" },
+                    operator: "＋",
                     sahen2: null,
                     answer: null,
                 }
@@ -120,7 +113,7 @@
                 //テキストフィールドを空に
                 this.newFm = { 
                     sahen1: null,
-                    operator: { value: "+", text: "＋" },
+                    operator: "＋",
                     sahen2: null,
                     answer: null
                 };
